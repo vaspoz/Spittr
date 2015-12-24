@@ -1,13 +1,15 @@
 package edu.vaspoz.spittr.controller;
 
+import edu.vaspoz.spittr.Spittle;
+import edu.vaspoz.spittr.SpittleForm;
 import edu.vaspoz.spittr.data.SpittleRepository;
+import edu.vaspoz.spittr.exceptions.SpittleNotFountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * Created by Vasilii_Pozdeev on 24-Dec-15.
@@ -55,8 +57,24 @@ public class SpittleController {
             @PathVariable long spittleId,
             Model model) {
 
-        model.addAttribute(spittleRepository.findOne(spittleId));
+        Spittle spittle = spittleRepository.findOne(spittleId);
+        if (spittle == null) {
+            throw new SpittleNotFountException();
+        }
+        model.addAttribute(spittle);
         return "spittle";
 
     }
+
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String saveSpittle(SpittleForm form, Model model) {
+
+        spittleRepository.save(
+                new Spittle(form.getMessage(), new Date(), form.getLongitude(), form.getLatitude())
+        );
+        return "redirect:/spittles";
+
+    }
+
 }
