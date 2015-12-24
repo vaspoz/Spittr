@@ -53,6 +53,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
             public Spittle findOne(long spittleId) {
                 return new Spittle("Hi! I`m just a spittle with id = " + spittleId, new Date());
             }
+
+            @Override
+            public Spittle save(Spittle spittle) {
+                return null;
+            }
         };
 
     }
