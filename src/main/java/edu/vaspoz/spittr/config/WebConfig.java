@@ -18,11 +18,18 @@ import edu.vaspoz.spittr.data.SpittleRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.web.accept.ContentNegotiationManager;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.BeanNameViewResolver;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,8 +40,25 @@ import java.util.List;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan("edu.vaspoz.spittr.controller")
+@ComponentScan({"edu.vaspoz.spittr.controller", "edu.vaspoz.spittr.api."})
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+
+    @Bean
+    public View spittles() {
+
+        return new MappingJackson2JsonView();
+
+    }
+
+
+    @Bean
+    public ViewResolver beanViewResolver() {
+
+        return new BeanNameViewResolver();
+
+    }
+
 
     @Bean
     public ViewResolver viewResolver() {
@@ -47,6 +71,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     }
 
+
+    @Bean
+    public ViewResolver restViewResolver(ContentNegotiationManager manager) {
+
+        ContentNegotiatingViewResolver viewResolver = new ContentNegotiatingViewResolver();
+        viewResolver.setContentNegotiationManager(manager);
+        return viewResolver;
+
+    }
 
     // Just mock-repo
     @Bean
@@ -125,6 +158,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 
         configurer.enable();
+
+    }
+
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+
+        configurer.defaultContentType(MediaType.TEXT_HTML);
 
     }
 }
